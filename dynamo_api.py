@@ -1,21 +1,54 @@
 import boto3
+import json
 
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table("visitor_counter")
 
-table_name = "visitor_counter"                                       
-dynamodb_resource = boto3.resource("dynamodb")
-users_table = dynamodb_resource.Table(table_name)
+def lambda_handler(event, context):
+    if event.get("httpMethod") == "OPTIONS":
+        return {
+            "statusCode": 200,
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Methods": "GET,POST,OPTIONS"
+            },
+            "body": ""
+        }
+    if event.get("httpMethod") == "GET":
+        # Return current visitor count without incrementing
+        current = table.get_item(Key={"id": "counter"})
+        visitor_count = int(current["Item"]["visitor_number"])
+        return {
+            "statusCode": 200,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps(visitor_count)
+        }
+    try:
+        body = json.loads(event.get("body", "{}"))
+        visited = body.get("visited", False)
 
-def lambda_handler(event,context):
-    response = users_table.update_item(
-        Key={"id": "counter"},
-        UpdateExpression="set visitor_number = visitor_number + :n",
-        ExpressionAttributeValues={":n": 1},
-        ReturnValues="UPDATED_NEW",
-    )
-    return response["Attributes"]["visitor_number"]
+        if not visited:
+            response = table.update_item(
+                Key={"id": "counter"},
+                UpdateExpression="SET visitor_number = visitor_number + :n",
+                ExpressionAttributeValues={":n": 1},
+                ReturnValues="UPDATED_NEW"
+            )
+            visitor_count = int(response["Attributes"]["visitor_number"])
+        else:
+            # Just return current count without incrementing
+            current = table.get_item(Key={"id": "counter"})
+            visitor_count = int(current["Item"]["visitor_number"])
 
-
-    # it reruns every time someone reloads. any way to keep track of individual visitors and not just increment per load? cookies?
-    # yes, but probably not here. in javascript, only run the api if there is a new user
-    # but if someone finds the link and keeps reloading it they could fuck up the visitor count
-    # keep it restricted to iam user? would it still work?
+        return {
+            "statusCode": 200,
+            "headers": {"Access-Control-Allow-Origin": "*",},
+            "body": json.dumps(visitor_count)
+        }
+    except Exception as e:
+        return {
+            "statusCode": 500,
+            "headers": {"Access-Control-Allow-Origin": "*"},
+            "body": json.dumps({"error": str(e)})
+        }
