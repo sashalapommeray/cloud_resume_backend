@@ -16,7 +16,6 @@ def lambda_handler(event, context):
             "body": ""
         }
     if event.get("httpMethod") == "GET":
-        # Return current visitor count without incrementing
         current = table.get_item(Key={"id": "counter"})
         visitor_count = int(current["Item"]["visitor_number"])
         return {
@@ -37,7 +36,6 @@ def lambda_handler(event, context):
             )
             visitor_count = int(response["Attributes"]["visitor_number"])
         else:
-            # Just return current count without incrementing
             current = table.get_item(Key={"id": "counter"})
             visitor_count = int(current["Item"]["visitor_number"])
 
@@ -52,3 +50,4 @@ def lambda_handler(event, context):
             "headers": {"Access-Control-Allow-Origin": "*"},
             "body": json.dumps({"error": str(e)})
         }
+
