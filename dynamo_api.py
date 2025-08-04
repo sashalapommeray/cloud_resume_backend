@@ -2,7 +2,7 @@ import boto3
 import json
 
 dynamodb = boto3.resource("dynamodb", region_name="us-east-1")
-table = dynamodb.Table("visitor_counter")
+table = dynamodb.Table("visitor_counter_v1")
 
 def lambda_handler(event, context):
     if event.get("httpMethod") == "OPTIONS":
