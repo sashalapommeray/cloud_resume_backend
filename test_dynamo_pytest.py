@@ -49,7 +49,7 @@ def test_post_existing_visitor(mock_put, mock_get):
     mock_put.assert_not_called()
 
 @patch.object(dynamo_api.table, "put_item")
-@patch.object(dynamo_api.table, "get_item", return_value={})  
+@patch.object(dynamo_api.table, "get_item", side_effect=[{}, {"Item": {"visitor_number": 0}}])
 def test_initializes_counter(mock_get, mock_put):
     event = {"httpMethod": "GET"}
     response = dynamo_api.lambda_handler(event, None)
