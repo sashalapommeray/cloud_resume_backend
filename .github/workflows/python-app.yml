@@ -43,13 +43,13 @@ jobs:
     - name: Package SAM application
       run: |
         sam package \
-          --template-file cloud_resume_backend/template.yml \
+          --template-file template.yml \
           --output-template-file packaged.yaml \
           --s3-bucket ${{ secrets.S3_BUCKET }}
 
     - name: Deploy SAM application
       run: |
         sam deploy \
-          --template-file cloud_resume_backend/template.yml \
+          --template-file template.yml \
           --stack-name cloud-resume \
           --capabilities CAPABILITY_IAM
