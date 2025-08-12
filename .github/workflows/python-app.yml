@@ -1,21 +1,55 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
-name: Pytest
+name: Test and Deploy SAM App
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main  
+  pull_request:
 
 jobs:
-  test:
+  test-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup Python
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: 3.9
+
     - name: Install dependencies
       run: pip install boto3 pytest
+
     - name: Run pytest tests
       run: pytest -v
+
+    # Only deploy if tests pass
+    - name: Set up AWS CLI
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1  
+
+    - name: Install AWS SAM CLI
+      run: |
+        pip install aws-sam-cli
+
+    - name: Package SAM application
+      run: |
+        sam package \
+          --template-file cloud_resume_backend/template.yml \
+          --output-template-file packaged.yaml \
+          --s3-bucket ${{ secrets.S3_BUCKET }}
+
+    - name: Deploy SAM application
+      run: |
+        sam deploy \
+          --template-file cloud_resume_backend/template.yml \
+          --stack-name cloud-resume \
+          --capabilities CAPABILITY_IAM
