@@ -53,3 +53,5 @@ jobs:
           --template-file template.yml \
           --stack-name cloud-resume \
           --capabilities CAPABILITY_IAM
+          --no-confirm-changeset \
+          --no-fail-on-empty-changeset
