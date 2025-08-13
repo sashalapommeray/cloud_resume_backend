@@ -45,8 +45,8 @@ jobs:
         sam package \
           --template-file template.yml \
           --output-template-file packaged.yaml \
-          --s3-bucket ${{ secrets.S3_BUCKET }} \
-          # --resolve-s3 
+          --s3-bucket ${{ secrets.S3_BUCKET }}
+          --resolve-s3 false \
 
     - name: Deploy SAM application
       run: |
@@ -55,7 +55,7 @@ jobs:
           --stack-name cloud-resume \
           --capabilities CAPABILITY_IAM \
           --s3-bucket ${{ secrets.S3_BUCKET }} \
-          # --resolve-s3 \
+          --resolve-s3 false \
           --region us-east-1\
           --no-confirm-changeset \
           --no-fail-on-empty-changeset
