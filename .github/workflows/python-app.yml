@@ -45,7 +45,7 @@ jobs:
         sam package \
           --template-file template.yml \
           --output-template-file packaged.yaml \
-          --s3-bucket ${{ secrets.S3_BUCKET }}
+          --s3-bucket ${{ secrets.S3_BUCKET }} \
           --resolve-s3 false
 
     - name: Deploy SAM application
