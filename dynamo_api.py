@@ -16,7 +16,7 @@ def lambda_handler(event, context):
             "body": ""
         }
 
-    #  have to initialize in lambda function because you arent able to using sam
+    #  you have to initialize in lambda function because you arent able to using sam
     try:
         current = table.get_item(Key={"id": "counter"})
         if "Item" not in current:
