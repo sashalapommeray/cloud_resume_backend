@@ -1,6 +1,6 @@
 # Cloud Resume Challenge - Backend
 
-This repository contains the backend infrastructure for the Cloud Resume Challenge. It features a serverless application built with AWS SAM that creates an API to track the number of visitors to a resume website.
+This repository contains the backend infrastructure for the [Cloud Resume Challenge](https://cloudresumechallenge.dev/). It features a serverless application built with AWS SAM that creates an API to track the number of visitors to a resume website.
 
 ## Architecture
 
